@@ -27,8 +27,8 @@ const CameraPrototypePage = () => {
 
       setIsCameraOn(true); //카메라 켜짐 상태로
     } catch (error) {
-      console.error(error);
-      setErrorMessage('카메라를 실행할 수 없습니다.');
+      console.error('카메라 실행 오류:', error);
+      setErrorMessage(`카메라 실행 실패: ${error.message}`);
     }
   };
 
@@ -129,16 +129,28 @@ const CameraPrototypePage = () => {
 
       <div>
         {!isCameraOn ? (
-          <button type="button" onClick={startCamera}>
+          <button 
+            type="button" 
+            onClick={startCamera}
+            className="rounded-lg bg-black px-4 py-3 text-white"
+          >
             카메라 시작
           </button>
         ) : (
             <>
-              <button type="button" onClick={capturePhoto}>
+              <button 
+                type="button" 
+                onClick={capturePhoto}
+                className="rounded-lg bg-black px-4 py-3 text-white"
+              >
                 사진 촬영
               </button>
 
-              <button type="button" onClick={stopCamera}>
+              <button 
+                type="button" 
+                onClick={stopCamera}
+                className="rounded-lg bg-black px-4 py-3 text-white"
+              >
                 촬영 종료
               </button>
             </>
@@ -148,9 +160,11 @@ const CameraPrototypePage = () => {
       {errorMessage && <p>{errorMessage}</p>} 
 
       <section>
-        <h2>촬영한 사진: {photos.length}장</h2>
+        <h2 className="mb-2 text-lg font-bold">
+          촬영한 사진: {photos.length}장
+        </h2>
 
-        <div>
+        <div className="flex overflow-x-auto">
             {photos.map((photo) => (
                 <img
                     key={photo.id}

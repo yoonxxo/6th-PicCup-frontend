@@ -11,9 +11,11 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.3.2",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-router": "^8.2.0"
+    "react-router": "^8.2.0",
+    "tailwindcss": "^4.3.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.1",
