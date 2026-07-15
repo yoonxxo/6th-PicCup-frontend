@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
+import { savePhoto } from '../libs/photoDB';
 
 const CameraPrototypePage = () => {
   const videoRef = useRef(null); //실제 <video> DOM 요소를 참조
   const streamRef = useRef(null); // getUserMedia로 받은 MediaStream 객체를 보관
+  const sessionIdRef = useRef(null); //세션 ID를 보관
 
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -19,6 +21,9 @@ const CameraPrototypePage = () => {
         audio: false,
       });
 
+      sessionIdRef.current = crypto.randomUUID(); //세션 ID를 랜덤으로 생성하여 sessionIdRef에 저장
+      setPhotos([]); //새로운 세션이 시작되면 이전에 촬영한 사진들을 초기화
+
       streamRef.current = stream; //MediaStream 객체를 streamRef.current에 저장.
 
       if (videoRef.current) { //<video> 태그가 존재하면
@@ -27,8 +32,8 @@ const CameraPrototypePage = () => {
 
       setIsCameraOn(true); //카메라 켜짐 상태로
     } catch (error) {
-      console.error(error);
-      setErrorMessage('카메라를 실행할 수 없습니다.');
+      console.error('카메라 실행 오류:', error);
+      setErrorMessage(`카메라 실행 실패: ${error.message}`);
     }
   };
 
@@ -38,6 +43,11 @@ const CameraPrototypePage = () => {
     }
 
     const video = videoRef.current;
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+        setErrorMessage("카메라가 준비되지 않았습니다.");
+        return;
+    }
+
     const canvas = document.createElement('canvas');
     //canvas는 그림을 그릴 수 있는 HTML 요소 (사진 생성을 위한 임시 도화지)
 
@@ -61,22 +71,37 @@ const CameraPrototypePage = () => {
     
 
     canvas.toBlob( //canvas를 사진 Blob(저장할 수 있는 이미지 데이터)으로 변환
-        (blob) => { //콜백 함수로 blob을 받아옴
+        async (blob) => { //콜백 함수로 blob을 받아옴
             if (!blob) {
                 setErrorMessage("사진 생성에 실패했습니다.");
                 return;
             }
 
-            const photo = {
-                id: crypto.randomUUID(),
+            try {
+              const photo = {
+                id: crypto.randomUUID(), 
+                sessionId: sessionIdRef.current, //세션 ID를 photo 객체에 저장
                 blob,
-                previewUrl: URL.createObjectURL(blob), //Blob을 브라우저에서 볼 수 있는 URL로 변환
+                status: 'active',
                 createdAt: new Date().toISOString(), //촬영한 시간을 문자열로 저장
+            };
+
+              await savePhoto(photo); //IndexedDB에 photo 객체 저장
+
+              const previewPhoto = {
+                  ...photo, // 기존 photo 객체의 속성을 모두 복사
+                  previewUrl: URL.createObjectURL(blob), //Blob을 브라우저에서 볼 수 있는 URL로 변환
+              }; //previewUrl은 임시주소이기 때문에 IndexedDB에 저장하지 않는다.
+
+              setPhotos((prevPhotos) => [
+                  ...prevPhotos, 
+                  previewPhoto,
+              ]); // 기존 photos 배열에 화면 표시용 previewPhoto 객체 추가
+
+            } catch (error) {
+                console.error('사진 저장 실패:', error);
+                setErrorMessage(`사진 저장 실패: ${error.message}`);
             }
-            setPhotos((prevPhotos) => [
-                ...prevPhotos, 
-                photo,
-            ]); //기존 photos 배열에 새로 촬영한 photo 객체를 추가
         },
         'image/jpeg',
         0.95,
@@ -129,16 +154,28 @@ const CameraPrototypePage = () => {
 
       <div>
         {!isCameraOn ? (
-          <button type="button" onClick={startCamera}>
+          <button 
+            type="button" 
+            onClick={startCamera}
+            className="rounded-lg bg-black px-4 py-3 text-white"
+          >
             카메라 시작
           </button>
         ) : (
             <>
-              <button type="button" onClick={capturePhoto}>
+              <button 
+                type="button" 
+                onClick={capturePhoto}
+                className="rounded-lg bg-black px-4 py-3 text-white"
+              >
                 사진 촬영
               </button>
 
-              <button type="button" onClick={stopCamera}>
+              <button 
+                type="button" 
+                onClick={stopCamera}
+                className="rounded-lg bg-black px-4 py-3 text-white"
+              >
                 촬영 종료
               </button>
             </>
@@ -148,9 +185,11 @@ const CameraPrototypePage = () => {
       {errorMessage && <p>{errorMessage}</p>} 
 
       <section>
-        <h2>촬영한 사진: {photos.length}장</h2>
+        <h2 className="mb-2 text-lg font-bold">
+          촬영한 사진: {photos.length}장
+        </h2>
 
-        <div>
+        <div className="flex overflow-x-auto">
             {photos.map((photo) => (
                 <img
                     key={photo.id}
