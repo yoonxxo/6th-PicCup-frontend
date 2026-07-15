@@ -6,7 +6,7 @@ const HomePage = () => {
       <h1>PicCup 홈</h1>
 
       <Link to="/prototype/camera"
-            className="mt-6 inline-block rounded-lg bg-black px-4 py-3 text-white"
+        className="mt-6 inline-block rounded-lg bg-black px-4 py-3 text-white"
       >
         카메라 프로토타입 열기
       </Link>
