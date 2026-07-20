@@ -9,6 +9,7 @@ const CameraPrototypePage = () => {
   const [isCameraOn, setIsCameraOn] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [photos, setPhotos] = useState([]);
+  const [aspectRatio, setAspectRatio] = useState('3/4');
 
   const startCamera = async () => {
     try { //try 성공하면 그대로 진행, 실패하면 catch로 이동
@@ -51,8 +52,33 @@ const CameraPrototypePage = () => {
     const canvas = document.createElement('canvas');
     //canvas는 그림을 그릴 수 있는 HTML 요소 (사진 생성을 위한 임시 도화지)
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    const targetRatio = { //사용자가 선택한 비율을 숫자로 바꾼 값
+      '3/4': 3 / 4,
+      '9/16': 9 / 16,
+      '1/1': 1,
+    }[aspectRatio]
+
+    const videoWidth = video.videoWidth;
+    const videoHeight = video.videoHeight;
+    const videoRatio = videoWidth / videoHeight; //실제 카메라 영상의 비율
+    
+    /*원본 영상에서 자르기 시작할 위치*/
+    let sourceX = 0; 
+    let sourceY = 0;
+    /*원본 영상에서 실제로 잘라낼 영역의 크기*/
+    let sourceWidth = videoWidth;
+    let sourceHeight = videoHeight;
+
+    if (videoRatio > targetRatio) { //목표비율보다 넓으면 좌우 자르기
+      sourceWidth = videoHeight * targetRatio;
+      sourceX = (videoWidth - sourceWidth) / 2;
+    } else { //목표비율보다 길면 위아래 자르기
+      sourceHeight = videoWidth / targetRatio;
+      sourceY = (videoHeight - sourceHeight) / 2;
+    }
+
+    canvas.width = Math.round(sourceWidth);
+    canvas.height = Math.round(sourceHeight);
 
     const context = canvas.getContext('2d');
     //context는 canvas에 그림을 그릴 수 있는 2D 컨텍스트 객체
@@ -63,11 +89,18 @@ const CameraPrototypePage = () => {
     }
 
     context.drawImage(
-        video, //video의 현재 프래임을 가져와서 
+        video, //video의 현재 프래임을 가져와서
+
+        sourceX, //원본에서 가져올 영역
+        sourceY,
+        sourceWidth,
+        sourceHeight,
+
         0, // canvas의 왼쪽 상단 좌표 (0, 0)에서 시작하여
         0, 
         canvas.width, //canvas의 너비와 높이로 그리기
-        canvas.height); 
+        canvas.height,
+      ); 
     
 
     canvas.toBlob( //canvas를 사진 Blob(저장할 수 있는 이미지 데이터)으로 변환
@@ -134,77 +167,116 @@ const CameraPrototypePage = () => {
     };
   }, []);
 
+  const latestPhoto = photos[ photos.length -1 ];
+  const aspectRatioClass = {
+    '3/4': 'aspect-[3/4]',
+    '9/16': 'aspect-[9/16]',
+    '1/1': 'aspect-square',
+  }[aspectRatio];
+  const changeAspectRatio = () => {
+    if (aspectRatio === '3/4') {
+      setAspectRatio('9/16');
+    } else if (aspectRatio === '9/16') {
+      setAspectRatio('1/1');
+    } else {
+      setAspectRatio('3/4');
+    }
+  };
+
   return (
-    <main>
-      <h1>카메라 촬영 프로토타입</h1>
-
-      <video
-        ref={videoRef} //videoRef 연결
-        autoPlay
-        playsInline //전체화면으로 열리는 것을 방지
-        muted //음소거
-        style={{
-          width: '100%',
-          maxWidth: '420px',
-          aspectRatio: '3 / 4',
-          objectFit: 'cover',
-          backgroundColor: '#222',
-        }}
-      />
-
-      <div>
-        {!isCameraOn ? (
-          <button 
-            type="button" 
-            onClick={startCamera}
-            className="rounded-lg bg-black px-4 py-3 text-white"
+    <main className = "relative mx-auto h-dvh w-full max-w-md overflow-hidden bg-background">
+      <header className = "absolute inset-x-0 top-0 z-20 flex h-20 items-end justify-between px-4 pb-3">
+        <button
+          type="button"
+          className = "rounded-full bg-primary px-8 py-1.5 text-sm font-semibold text-white"
           >
-            카메라 시작
+            풍경
+          </button>
+
+        <button
+          type="button"
+          className="flex size-9 items-center justify-center rounded-lg bg-surface text-lg"
+          aria-label="카메라 설정 열기"
+        >
+          ⌄
+        </button>
+      </header>
+
+      <section 
+        className = {`absolute left-0 top-20 z-0 w-full overflow-hidden bg-black ${aspectRatioClass}`}
+        >
+          <video
+          ref={videoRef} //videoRef 연결
+          autoPlay
+          playsInline //전체화면으로 열리는 것을 방지
+          muted //음소거
+          className = "h-full w-full object-cover"
+          />
+
+      </section>
+
+      <section className="absolute inset-x-0 bottom-20 z-20 grid h-24 grid-cols-3 items-center px-6">
+          <button
+            type="button"
+            onClick={changeAspectRatio} 
+            className="justify-self-start rounded-full bg-surface px-3 py-2 text-sm"
+          >
+            {aspectRatio.replace('/', ':')}
+          </button>
+      
+        {! isCameraOn ? (
+          <button
+            type="button"
+            onClick={startCamera}
+            className="flex size-14 border-4 bg-primary items-center justify-center justify-self-center rounded-full"
+            aria-label="카메라 시작"
+          >
           </button>
         ) : (
-            <>
-              <button 
-                type="button" 
-                onClick={capturePhoto}
-                className="rounded-lg bg-black px-4 py-3 text-white"
-              >
-                사진 촬영
-              </button>
+          <button
+            type="button"
+            onClick={capturePhoto}
+            className="flex size-14 border-4 bg-surface items-center justify-center justify-self-center rounded-full"
+            aria-label="사진 촬영"
+          >
+          </button>
+        )}
 
-              <button 
-                type="button" 
-                onClick={stopCamera}
-                className="rounded-lg bg-black px-4 py-3 text-white"
-              >
-                촬영 종료
-              </button>
-            </>
-          )}
-      </div>
+        <button
+          type="button"
+          className="size-10 justify-self-end rounded-full bg-surface text-lg"
+          aria-label="카메라 방향 전환"
+        >
+          ↻
+        </button>
+      </section>
 
       {errorMessage && <p>{errorMessage}</p>} 
 
-      <section>
-        <h2 className="mb-2 text-lg font-bold">
-          촬영한 사진: {photos.length}장
-        </h2>
-
-        <div className="flex overflow-x-auto">
-            {photos.map((photo) => (
-                <img
-                    key={photo.id}
-                    src={photo.previewUrl}
-                    alt={`촬영한 사진 ${photo.id}`}
-                    style={{
-                        width: '120px',
-                        height: '160px',
-                        objectFit: 'cover',
-                        marginRight: '8px',
-                    }}
-                />
-            ))}
+      <footer className="absolute inset-x-0 bottom-0 z-20 grid h-20 grid-cols-3 items-center px-5 pb-3">
+        <div className="justify-self-start size-12 overflow-hidden rounded-xl bg-surface">
+          {latestPhoto && ( //latestPhoto가 없으면 렌더링 하지 않고
+            <img //있으면 <img> 렌더링
+              src={latestPhoto.previewUrl} 
+              alt="최근 촬영한 사진"
+              className="h-full w-full object-cover"
+            />
+          )}
         </div>
-      </section>
+
+        <p className="text-center text-sm font-medium">
+          {photos.length}장 촬영했어요.
+        </p>
+
+        <button
+          type="button"
+          onClick={stopCamera}
+          className="flex size-12 items-center justify-center justify-self-end rounded-full bg-surface text-xl"
+          aria-label="촬영 완료"
+        >
+          →
+        </button>
+      </footer>
       
     </main>
   );
