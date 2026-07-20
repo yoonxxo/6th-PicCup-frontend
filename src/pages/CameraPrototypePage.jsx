@@ -182,10 +182,15 @@ const CameraPrototypePage = () => {
       setAspectRatio('3/4');
     }
   };
+  const cameraPositionClass = {
+    '1/1': 'top-24',
+    '3/4': 'top-14',
+    '9/16': 'top-0',
+  }[aspectRatio];
 
   return (
     <main className = "relative mx-auto h-dvh w-full max-w-md overflow-hidden bg-background">
-      <header className = "absolute inset-x-0 top-0 z-20 flex h-20 items-end justify-between px-4 pb-3">
+      <header className = "absolute inset-x-0 top-0 z-20 flex h-14 items-end justify-between px-4 pb-3">
         <button
           type="button"
           className = "rounded-full bg-primary px-8 py-1.5 text-sm font-semibold text-white"
@@ -203,7 +208,7 @@ const CameraPrototypePage = () => {
       </header>
 
       <section 
-        className = {`absolute left-0 top-20 z-0 w-full overflow-hidden bg-black ${aspectRatioClass}`}
+        className = {`absolute left-0 z-0 ${cameraPositionClass} w-full overflow-hidden bg-black ${aspectRatioClass}`}
         >
           <video
           ref={videoRef} //videoRef 연결
