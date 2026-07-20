@@ -1,4 +1,29 @@
 @import "tailwindcss";
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css"); /* pretendard 폰트 불러오기 */
+
+@theme { /* theme으로 정의하면 CSS 변수, Tailwind CSS 둘 다 사용 가능 */
+  --color-primary: #D9042B;
+  --color-primary-light: #4d3a2e;
+
+  --color-secondary: #F27289;
+
+  --color-background: #ffffff;
+  --color-surface: #D9D8D2;
+
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #767676;
+
+  --color-border: #e5e5e5;
+  --color-error: #e5484d;
+
+  --font-sans:
+    "Pretendard Variable", 
+    Pretendard, 
+    -apple-system, 
+    BlinkMacSystemFont, 
+    system-ui, 
+    sans-serif;
+}
 
 * {
   box-sizing: border-box;
@@ -8,12 +33,12 @@ html,
 body,
 #root {
   margin: 0;
-  min-width: 320px;
-  min-height: 100%;
+  min-height: 100%; 
 }
 
 body {
-  color: #111;
-  background: #fff;
-  font-family: Arial, sans-serif;
+  min-height: 100dvh; /* 모바일 브라우저 주소창이 열리고 닫히는 상황 고려 */
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  font-family: var(--font-sans);
 }
