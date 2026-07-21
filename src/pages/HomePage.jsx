@@ -1,15 +1,17 @@
 import { Link } from 'react-router';
 
 const HomePage = () => {
+  
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <main className="mx-auto max-w-md bg-gray-100 p-8">
       <h1>PicCup 홈</h1>
-
-      <Link to="/prototype/camera"
-        className="bg-primary font-sans text-white"
-      >
-        카메라 프로토타입 열기
-      </Link>
+        <div>
+          <Link to="/category"
+            className="bg-primary font-sans text-white"
+          >
+            카테고리 열기
+          </Link>
+        </div>
     </main>
   );
 };

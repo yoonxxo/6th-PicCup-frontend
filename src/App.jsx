@@ -1,6 +1,8 @@
 import { Route, Routes } from "react-router";
-import CameraPrototypePage from "./pages/CameraPrototypePage";
+import CameraPage from "./pages/CameraPage";
 import HomePage from "./pages/HomePage";
+import TournamentPage from "./pages/TournamentPage";
+import CategoryPage from "./pages/CategoryPage";
 
 const App = () => {
   return (
@@ -10,8 +12,16 @@ const App = () => {
         element={<HomePage />} 
       />
       <Route 
-        path="/prototype/camera" 
-        element={<CameraPrototypePage />} 
+        path="/camera" 
+        element={<CameraPage />} 
+      />
+      <Route
+        path="/tournament/:sessionId" //:는 변수라는 뜻
+        element={<TournamentPage />}
+      />
+      <Route
+        path="/category" //:는 변수라는 뜻
+        element={<CategoryPage />}
       />
     </Routes>
   )

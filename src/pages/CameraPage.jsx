@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { savePhoto } from '../libs/photoDB';
+import { useNavigate } from 'react-router';
 
-const CameraPrototypePage = () => {
+const CameraPage = () => {
   const videoRef = useRef(null); //실제 <video> DOM 요소를 참조
   const streamRef = useRef(null); // getUserMedia로 받은 MediaStream 객체를 보관
   const sessionIdRef = useRef(null); //세션 ID를 보관
@@ -10,6 +11,8 @@ const CameraPrototypePage = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [photos, setPhotos] = useState([]);
   const [aspectRatio, setAspectRatio] = useState('3/4');
+
+  const navigate = useNavigate();
 
   const startCamera = async () => {
     try { //try 성공하면 그대로 진행, 실패하면 catch로 이동
@@ -157,6 +160,17 @@ const CameraPrototypePage = () => {
     setIsCameraOn(false);
   };
 
+  const completeCapture = () => {
+    const sessionId = sessionIdRef.current;
+
+    if (!sessionId || photos.length === 0) {
+      return;
+    }
+
+    stopCamera();
+    navigate(`/tournament/${sessionId}`);
+  }
+
   useEffect(() => {
     return () => { //컴포넌트가 언마운트될 때 카메라 종료
       if (streamRef.current) { //종료할 스트림이 존재하지 않으면 필요없음
@@ -182,10 +196,15 @@ const CameraPrototypePage = () => {
       setAspectRatio('3/4');
     }
   };
+  const cameraPositionClass = {
+    '1/1': 'bottom-48',
+    '3/4': 'bottom-20',
+    '9/16': 'bottom-20',
+  }[aspectRatio];
 
   return (
     <main className = "relative mx-auto h-dvh w-full max-w-md overflow-hidden bg-background">
-      <header className = "absolute inset-x-0 top-0 z-20 flex h-20 items-end justify-between px-4 pb-3">
+      <header className = "absolute inset-x-0 top-0 z-20 flex h-14 items-end justify-between px-4 pb-3">
         <button
           type="button"
           className = "rounded-full bg-primary px-8 py-1.5 text-sm font-semibold text-white"
@@ -203,7 +222,7 @@ const CameraPrototypePage = () => {
       </header>
 
       <section 
-        className = {`absolute left-0 top-20 z-0 w-full overflow-hidden bg-black ${aspectRatioClass}`}
+        className = {`absolute left-0 z-0 ${cameraPositionClass} w-full overflow-hidden bg-black ${aspectRatioClass}`}
         >
           <video
           ref={videoRef} //videoRef 연결
@@ -270,7 +289,7 @@ const CameraPrototypePage = () => {
 
         <button
           type="button"
-          onClick={stopCamera}
+          onClick={completeCapture}
           className="flex size-12 items-center justify-center justify-self-end rounded-full bg-surface text-xl"
           aria-label="촬영 완료"
         >
@@ -282,7 +301,7 @@ const CameraPrototypePage = () => {
   );
 };
 
-export default CameraPrototypePage;
+export default CameraPage;
 
 
 /*
