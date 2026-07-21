@@ -16,6 +16,9 @@ import { useParams } from 'react-router';
 import { getPhotosBySessionId } from '../libs/photoDB'; //IndexedDB의 저장소에서 같은 sessionId를 가진 사진을 가져오는 함수
 import useCategoryStore from '../store/useCategoryStore';
 
+import { getLocalDateString } from '../libs/date';
+import { uploadBestPick } from '../api/bestPickApi';
+
 const TournamentPage = () => {
   const { sessionId } = useParams(); //라우터에서 주소 뒷부분(변수)를 객체로 반환해서 sessionId에 저장
   
@@ -25,6 +28,10 @@ const TournamentPage = () => {
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0); //현재 몇 번째 사진부터 대결하는지 나타냄
   const [winner, setWinner] = useState(null); //최종 우승 사진
   const [isLoading, setIsLoading] = useState(true); //IndexDB에서 사진을 불러오는 중인지
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const [uploadedBestPick, setUploadedBestPick] = useState(null); //서버 저장 성공응답 받은 베스트픽
+
 
   const selectedCategory = useCategoryStore(
     (state) => state.selectedCategory,
@@ -116,6 +123,47 @@ const TournamentPage = () => {
         </main>
     )
   }
+
+  const handleUploadBestPick = async () => {
+    if (!winner) {
+        return;
+    }
+
+    if (!selectedCategory) {
+        setUploadError('선택된 카테고리가 없습니다.');
+        return;
+    }
+
+    try {
+        setIsUploading(true);
+        setUploadError('');
+
+        const result = await uploadBestPick({
+            file: winner.blob,
+            categoryId: selectedCategory.id,
+            capturedDate: getLocalDateString(
+                new Date(winner.createdAt),
+            ),
+            candidateCount: photos.length,
+        });
+
+        setUploadedBestPick(result); //uploadBestPick이 반환한 response.data저장
+
+        console.log('베스트픽 업로드 성공:', result);
+    } catch (error) {
+        console.error('베스트픽 업로드 실패:', error);
+
+        const message =
+            error.response?.data?.message ?? //?.는 optional chaining, ?? 뒤는 기본 메세지
+            '베스트픽 저장에 실패했습니다.';
+
+        setUploadError(message);
+    } finally {
+        setIsUploading(false);
+    }
+  };
+
+
   return (
     <main className="relative mx-auto w-full max-w-md bg-background">
         {winner ? (
@@ -127,6 +175,26 @@ const TournamentPage = () => {
                     alt="최종 우승 사진"
                     className="w-full max-w-72 rounded-xl object-cover"
                 />
+
+                <button
+                    type="button"
+                    onClick={handleUploadBestPick}
+                    disabled={isUploading || Boolean(uploadedBestPick)}
+                    className="rounded-lg bg-primary px-4 py-2 text-white disabled:opacity-50"
+                >
+                    {isUploading ? '저장 중...' : '베스트픽 저장'}
+                </button>
+
+                {uploadError && (
+                    <p className="text-sm text-red-500">
+                        {uploadError}
+                    </p>
+                )}
+                {uploadedBestPick && (
+                    <p className="text-sm text-green-600">
+                        베스트픽이 저장되었습니다.
+                    </p>
+                )}
             </div>
             ) : (
             <div className="flex flex-col items-center gap-3">
