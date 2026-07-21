@@ -14,6 +14,7 @@ const dbPromise = openDB(DB_NAME, DB_VERSION, { //openDB()는 Promise를 반환
       photoStore.createIndex('sessionId', 'sessionId');
       photoStore.createIndex('status', 'status'); // 사진 상태
       photoStore.createIndex('createdAt', 'createdAt'); // 촬영 시간
+      /*createIndex는 검색할 속성을 정하는 것*/ 
     }
   },
 });
@@ -24,3 +25,12 @@ export const savePhoto = async (photo) => {
 
   return photo.id;
 };
+
+export const getPhotosBySessionId = async (sessionId) => {
+  const db = await openDB(DB_NAME, DB_VERSION);
+  return db.getAllFromIndex(
+    PHOTO_STORE,
+    'sessionId', 
+    sessionId, //매개변수로 받은 sessionId와 같은 사진을 PHOTO_STORE 저장소에서 찾음
+  ); //sessionId만 반환하는게 아니라 사진 객체 자체를 반환
+}

@@ -5,10 +5,10 @@ const HomePage = () => {
     <main className="min-h-screen bg-gray-100 p-8">
       <h1>PicCup 홈</h1>
 
-      <Link to="/prototype/camera"
+      <Link to="/camera"
         className="bg-primary font-sans text-white"
       >
-        카메라 프로토타입 열기
+        카메라 열기
       </Link>
     </main>
   );
