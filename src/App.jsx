@@ -1,10 +1,30 @@
 import { Route, Routes } from "react-router";
+import { useEffect } from "react";
+
+import { deleteExpiredTrashPhotos } from "./libs/photoDB";
+
 import CameraPage from "./pages/CameraPage";
 import HomePage from "./pages/HomePage";
 import TournamentPage from "./pages/TournamentPage";
 import CategoryPage from "./pages/CategoryPage";
 
 const App = () => {
+  useEffect(() => {
+    const cleanExpiredTrash = async () => {
+      try {
+        const deletedCount = await deleteExpiredTrashPhotos();
+
+        if (deletedCount > 0) {
+          console.log(`${deletedCount}장의 만료된 휴지통 사진을 영구 삭제했습니다.`);
+        }
+      } catch (error) {
+        console.error('만료된 휴지통 사진 삭제 실패:',error);
+      }
+    };
+
+    cleanExpiredTrash();
+  }, []);
+
   return (
     <Routes>
       <Route 
