@@ -13,7 +13,11 @@ export const uploadBestPick = async ({
   formData.append('capturedDate', capturedDate);
   formData.append('candidateCount', candidateCount);//백엔드쪽에서 int로 변환해서 받음
 
-  const response = await post('/best-picks', formData);
+  const response = await post('/best-picks', formData, {
+    headers: {
+      'X-User-Id': '1',
+    },
+  });
 
   return response.data; //실제 응답 데이터만 반환
 };
