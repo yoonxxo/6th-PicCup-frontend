@@ -34,3 +34,58 @@ export const getPhotosBySessionId = async (sessionId) => {
     sessionId, //매개변수로 받은 sessionId와 같은 사진을 PHOTO_STORE 저장소에서 찾음
   ); //sessionId만 반환하는게 아니라 사진 객체 자체를 반환
 }
+
+//const TRASH_RETENTION_DAYS = 7;
+
+
+export const losersToTrash = async ( //탈락 사진 이동 함수
+  sessionId,
+  winnerId, //winnerId와 다른 걸 보고 loser판단
+) => {
+  const db = await dbPromise; //IndexedDB 받아옴
+
+  const transaction = db.transaction(
+    PHOTO_STORE,
+    'readwrite', //읽기와 수정 가능
+  );
+
+  const sessionPhotos =
+    await transaction.store //photos 저장소
+      .index('sessionId') //sessionId 인덱스 사용하겠다.
+      .getAll(sessionId); //해당 sessionId와 같은 사진 객체를 모두 가져오기
+
+  const trashedAt = new Date(); //휴지통 이동 시각
+
+  /*const expiresAt = new Date(
+    trashedAt.getTime() + //trashedAt 시간을 밀리초 숫자로 바꾼 후
+      TRASH_RETENTION_DAYS * //7일 x 24시간, 60분, 60초, 1초
+        24 *
+        60 *
+        60 *
+        1000,
+  );*/
+  const expiresAt = new Date(
+  trashedAt.getTime() + 60 * 1000,  
+);
+
+  const loserPhotos = sessionPhotos.filter(
+    (photo) =>
+      photo.id !== winnerId &&
+      photo.status !== 'trash', //이미 휴지통 처리된 사진 중복 방지
+  );
+
+  const updateTrashStatus = loserPhotos.map(
+    (photo) =>
+      transaction.store.put({ //put은 기존 데이터 수정
+        ...photo,
+        status: 'trash',
+        trashedAt: trashedAt.toISOString(),
+        expiresAt: expiresAt.toISOString(),
+      }),
+  );
+
+  await Promise.all(updateTrashStatus); //상태 수정 요청을 전부 기다린다.
+  await transaction.done; //transaction 완료될때까지 기다림
+
+  return loserPhotos.length;
+};

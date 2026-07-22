@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router";
+
 import CameraPage from "./pages/CameraPage";
 import HomePage from "./pages/HomePage";
 import TournamentPage from "./pages/TournamentPage";
