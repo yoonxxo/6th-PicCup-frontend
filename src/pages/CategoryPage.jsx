@@ -10,7 +10,7 @@ const CategoryPage = () => {
 
     const startTestCapture = () => {
         setSelectedCategory({
-        id: 3,
+        id: 1,
         name: '테스트 카테고리',
         });
 
