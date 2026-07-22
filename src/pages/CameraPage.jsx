@@ -13,18 +13,7 @@ const CameraPage = () => {
   const [aspectRatio, setAspectRatio] = useState('3/4');
 
   const navigate = useNavigate();
-
   const ratioConfig = ASPECT_RATIO_CONFIG[aspectRatio]; //비율 설정
-
-  const {
-    videoRef,
-    isCameraOn,
-    cameraError,
-    facingMode,
-    startCamera: openCamera,//훅이 반환한 startCamera를 openCamera라는 이름으로 꺼냄
-    stopCamera,
-    switchCamera,
-  } = useCameraStream();
 
   const {
     photos,
@@ -38,6 +27,16 @@ const CameraPage = () => {
     sessionIdRef,
     targetRatio: ratioConfig.value, //훅에 ratio 값 전달
   })
+  
+  const {
+    videoRef,
+    isCameraOn,
+    cameraError,
+    facingMode,
+    startCamera: openCamera,//훅이 반환한 startCamera를 openCamera라는 이름으로 꺼냄
+    stopCamera,
+    switchCamera,
+  } = useCameraStream();
 
   useEffect(() => { //카메라 자동 시작
     const startCamera = async () => {
@@ -72,7 +71,7 @@ const CameraPage = () => {
 
   return (
     <main className = "relative mx-auto h-dvh w-full max-w-md overflow-hidden bg-background">
-      <header className = "absolute inset-x-0 top-0 z-20 flex h-20 items-end justify-between px-4 pb-2">
+      <header className = "absolute inset-x-0 top-0 z-20 flex h-14 items-end justify-between px-4 pb-3">
         <button
           type="button"
           className = "rounded-full bg-primary px-8 py-1.5 text-sm font-semibold text-white"
@@ -111,7 +110,7 @@ const CameraPage = () => {
 
       </section>
 
-      <section className="absolute inset-x-0 bottom-28 z-20 grid h-24 grid-cols-3 items-center px-6">
+      <section className="absolute inset-x-0 bottom-20 z-20 grid h-24 grid-cols-3 items-center px-6">
           <button
             type="button"
             onClick={changeAspectRatio} 
@@ -155,7 +154,7 @@ const CameraPage = () => {
       )} 
       
 
-      <footer className="absolute inset-x-0 bottom-0 z-20 grid h-28 grid-cols-3 items-center px-5 pb-4">
+      <footer className="absolute inset-x-0 bottom-0 z-20 grid h-20 grid-cols-3 items-center px-5 pb-3">
         <div className="justify-self-start size-12 overflow-hidden rounded-xl bg-surface">
           {latestPhoto && ( //latestPhoto가 없으면 렌더링 하지 않고
             <img //있으면 <img> 렌더링
