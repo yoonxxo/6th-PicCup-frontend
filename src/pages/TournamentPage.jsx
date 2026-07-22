@@ -75,7 +75,9 @@ const TournamentPage = () => {
                 winner.id,
         );
 
-        console.log(`${trashedCount}장의 탈락 사진을 휴지통으로 이동했습니다.`);
+        if (trashedCount > 0) {
+            console.log(`${trashedCount}장의 탈락 사진을 휴지통으로 이동했습니다.`);
+        }
         } catch (error) {
         console.error('탈락 사진 휴지통 이동 실패:', error);
         }
