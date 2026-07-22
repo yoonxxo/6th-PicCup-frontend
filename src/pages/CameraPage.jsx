@@ -5,6 +5,8 @@ import { ASPECT_RATIO_CONFIG } from '../constants/ratio';
 import useCameraStream from '../hooks/useCameraStream';
 import usePhotoCapture from '../hooks/usePhotoCapture';
 
+import { Scan, RefreshCw, ChevronDown, ArrowRight } from 'lucide-react';
+
 const CameraPage = () => {
   const sessionIdRef = useRef(null); //세션 ID를 보관
 
@@ -18,8 +20,10 @@ const CameraPage = () => {
     videoRef,
     isCameraOn,
     cameraError,
+    facingMode,
     startCamera: openCamera,//훅이 반환한 startCamera를 openCamera라는 이름으로 꺼냄
     stopCamera,
+    switchCamera,
   } = useCameraStream();
 
   const {
@@ -68,7 +72,7 @@ const CameraPage = () => {
 
   return (
     <main className = "relative mx-auto h-dvh w-full max-w-md overflow-hidden bg-background">
-      <header className = "absolute inset-x-0 top-0 z-20 flex h-14 items-end justify-between px-4 pb-3">
+      <header className = "absolute inset-x-0 top-0 z-20 flex h-20 items-end justify-between px-4 pb-2">
         <button
           type="button"
           className = "rounded-full bg-primary px-8 py-1.5 text-sm font-semibold text-white"
@@ -81,7 +85,10 @@ const CameraPage = () => {
           className="flex size-9 items-center justify-center rounded-lg bg-surface text-lg"
           aria-label="카메라 설정 열기"
         >
-          ⌄
+          <ChevronDown
+            size={20}
+            strokeWidth={2.3}
+          />
         </button>
       </header>
 
@@ -94,17 +101,30 @@ const CameraPage = () => {
           playsInline //전체화면으로 열리는 것을 방지
           muted //음소거
           className = "h-full w-full object-cover"
+          style={{
+            transform:
+              facingMode === 'user' //전면 카메라일 경우
+                ? 'scaleX(-1)' //좌우반전(거울처럼 보이게)
+                : 'none',
+          }}
           />
 
       </section>
 
-      <section className="absolute inset-x-0 bottom-20 z-20 grid h-24 grid-cols-3 items-center px-6">
+      <section className="absolute inset-x-0 bottom-28 z-20 grid h-24 grid-cols-3 items-center px-6">
           <button
             type="button"
             onClick={changeAspectRatio} 
-            className="justify-self-start rounded-full bg-surface px-3 py-2 text-sm"
+            className="relative flex size-12 items-center justify-center rounded-full bg-surface"
           >
-            {aspectRatio.replace('/', ':')}
+            <Scan
+              size={28}
+              strokeWidth={2.2}
+              aria-hidden="true"
+            />
+            <span className="absolute text-xs font-semibold">
+              {aspectRatio.replace('/', ':')}
+            </span>
           </button>
       
           <button
@@ -118,10 +138,15 @@ const CameraPage = () => {
 
         <button
           type="button"
-          className="size-10 justify-self-end rounded-full bg-surface text-lg"
+          onClick={switchCamera}
+          className="flex size-12 items-center justify-center justify-self-end rounded-full bg-surface"
           aria-label="카메라 방향 전환"
         >
-          ↻
+          <RefreshCw
+            size={24}
+            strokeWidth={2}
+            aria-hidden="true"
+          />
         </button>
       </section>
 
@@ -130,7 +155,7 @@ const CameraPage = () => {
       )} 
       
 
-      <footer className="absolute inset-x-0 bottom-0 z-20 grid h-20 grid-cols-3 items-center px-5 pb-3">
+      <footer className="absolute inset-x-0 bottom-0 z-20 grid h-28 grid-cols-3 items-center px-5 pb-4">
         <div className="justify-self-start size-12 overflow-hidden rounded-xl bg-surface">
           {latestPhoto && ( //latestPhoto가 없으면 렌더링 하지 않고
             <img //있으면 <img> 렌더링
@@ -151,7 +176,10 @@ const CameraPage = () => {
           className="flex size-12 items-center justify-center justify-self-end rounded-full bg-surface text-xl"
           aria-label="촬영 완료"
         >
-          →
+          <ArrowRight
+            size={28}
+            strokeWidth={2}
+          />
         </button>
       </footer>
       

@@ -6,6 +6,7 @@ const useCameraStream = () => {
 
     const [isCameraOn, setIsCameraOn] = useState(false);
     const [cameraError, setCameraError] = useState('');
+    const [facingMode, setFacingMode] = useState('environment');
 
     const stopCamera = useCallback(() => {
         if (streamRef.current) {
@@ -22,13 +23,15 @@ const useCameraStream = () => {
         setIsCameraOn(false);
     },[]);
 
-    const startCamera = useCallback(async () => {
+    const startCamera = useCallback(async (facingMode = 'envirionment') => {
         try { //try 성공하면 그대로 진행, 실패하면 catch로 이동
           setCameraError('');
         
           const stream = await navigator.mediaDevices.getUserMedia({ //여기서 getUserMedia가 promise를 반환. await로 기다려서 stream에 MediaStream을 넣음
             video: { //getUserMedia()가 성공하면(권한허용) 결과값을 돌려주고 실패하면 error를 던져줌
-              facingMode: 'environment', //후면카메라 우선
+              facingMode: {
+                ideal: facingMode,
+              },
             },
             audio: false,
           });
@@ -39,6 +42,7 @@ const useCameraStream = () => {
             videoRef.current.srcObject = stream; 
           } //<video> 태그의 srcObject에 stream 연결. 실시간 데이터는 src가 아니라 srcObject
     
+          setFacingMode(facingMode);
           setIsCameraOn(true); //카메라 켜짐 상태로
           return true; //카메라 시작 성공
 
@@ -54,13 +58,25 @@ const useCameraStream = () => {
             stopCamera();
         };
       }, [stopCamera]);
+    
+    const switchCamera = useCallback(async () => {
+        const nextFacingMode =
+            facingMode === 'environment'
+                ? 'user'
+                : 'environment';
+        stopCamera();
+
+        return startCamera(nextFacingMode);
+    }, [facingMode, startCamera, stopCamera]);
 
   return {
     videoRef,
     isCameraOn,
     cameraError,
+    facingMode,
     startCamera,
     stopCamera,
+    switchCamera,
   }
 }
 
