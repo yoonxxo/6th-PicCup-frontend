@@ -16,6 +16,16 @@ const CameraPage = () => {
   const ratioConfig = ASPECT_RATIO_CONFIG[aspectRatio]; //비율 설정
 
   const {
+    videoRef,
+    isCameraOn,
+    cameraError,
+    facingMode,
+    startCamera: openCamera,//훅이 반환한 startCamera를 openCamera라는 이름으로 꺼냄
+    stopCamera,
+    switchCamera,
+  } = useCameraStream();
+
+  const {
     photos,
     latestPhoto,
     captureError,
@@ -27,16 +37,7 @@ const CameraPage = () => {
     sessionIdRef,
     targetRatio: ratioConfig.value, //훅에 ratio 값 전달
   })
-  
-  const {
-    videoRef,
-    isCameraOn,
-    cameraError,
-    facingMode,
-    startCamera: openCamera,//훅이 반환한 startCamera를 openCamera라는 이름으로 꺼냄
-    stopCamera,
-    switchCamera,
-  } = useCameraStream();
+
 
   useEffect(() => { //카메라 자동 시작
     const startCamera = async () => {
