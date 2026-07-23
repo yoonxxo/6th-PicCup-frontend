@@ -176,7 +176,7 @@ const CameraPage = () => {
         <button
           type="button"
           onClick={completeCapture}
-          className="flex w-24 h-12 items-center justify-center justify-self-end rounded-4xl bg-white/90 ring-1 ring-primary/50"
+          className="flex w-24 h-12 items-center justify-center justify-self-end rounded-4xl bg-white/90 ring-1 ring-primary/50 hover:bg-primary/20 hover:cursor-pointer"
           aria-label="촬영 완료"
         >
           <ArrowRight
