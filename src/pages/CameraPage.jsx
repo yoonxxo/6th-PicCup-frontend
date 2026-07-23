@@ -71,8 +71,8 @@ const CameraPage = () => {
   }
 
   return (
-    <main className = "relative mx-auto h-dvh w-full max-w-md overflow-hidden bg-background">
-      <header className = "absolute inset-x-0 top-0 z-20 flex h-14 items-end justify-between px-4 pb-3">
+    <main className = "relative mx-auto h-dvh w-full max-w-md overflow-hidden">
+      <header className = "absolute inset-x-0 top-0 z-20 flex h-14 items-end justify-between px-4 pb-1">
         <button
           type="button"
           className = "rounded-full bg-primary px-8 py-1.5 text-sm font-semibold text-white"
@@ -82,7 +82,7 @@ const CameraPage = () => {
 
         <button
           type="button"
-          className="flex size-9 items-center justify-center rounded-lg bg-surface text-lg"
+          className="flex size-9 items-center justify-center rounded-xl bg-gray-100/90 text-lg"
           aria-label="카메라 설정 열기"
         >
           <ChevronDown
@@ -111,11 +111,11 @@ const CameraPage = () => {
 
       </section>
 
-      <section className="absolute inset-x-0 bottom-20 z-20 grid h-24 grid-cols-3 items-center px-6">
+      <section className="absolute inset-x-0 bottom-[calc(6rem+env(safe-area-inset-bottom))] z-20 grid h-24 grid-cols-3 items-center px-6">
           <button
             type="button"
             onClick={changeAspectRatio} 
-            className="relative flex size-12 items-center justify-center rounded-full bg-surface"
+            className="relative flex size-12 items-center justify-center rounded-full bg-gray-100/90 ring-1 ring-black/5"
           >
             <Scan
               size={28}
@@ -131,7 +131,7 @@ const CameraPage = () => {
             type="button"
             onClick={capturePhoto}
             disabled={!isCameraOn}
-            className="flex size-14 border-4 bg-surface items-center justify-center justify-self-center rounded-full"
+            className="flex size-20 border-4 border-gray-300 bg-white items-center justify-center justify-self-center rounded-full shadow-lg"
             aria-label="사진 촬영 버튼"
           >
           </button>
@@ -139,7 +139,7 @@ const CameraPage = () => {
         <button
           type="button"
           onClick={switchCamera}
-          className="flex size-12 items-center justify-center justify-self-end rounded-full bg-surface"
+          className="flex size-12 items-center justify-center justify-self-end rounded-full bg-gray-100/90 ring-1 ring-black/5"
           aria-label="카메라 방향 전환"
         >
           <RefreshCw
@@ -155,8 +155,8 @@ const CameraPage = () => {
       )} 
       
 
-      <footer className="absolute inset-x-0 bottom-0 z-20 grid h-20 grid-cols-3 items-center px-5 pb-3">
-        <div className="justify-self-start size-12 overflow-hidden rounded-xl bg-surface">
+      <footer className="absolute inset-x-0 bottom-0 z-20 grid h-[calc(6rem+env(safe-area-inset-bottom))] grid-cols-3 items-center px-6 pb-[env(safe-area-inset-bottom)]">
+        <div className="relative justify-self-start size-12 overflow-hidden rounded-xl bg-surface text-right">
           {latestPhoto && ( //latestPhoto가 없으면 렌더링 하지 않고
             <img //있으면 <img> 렌더링
               src={latestPhoto.previewUrl} 
@@ -164,16 +164,19 @@ const CameraPage = () => {
               className="h-full w-full object-cover"
             />
           )}
+          <div className="absolute inset-x-0 bottom-0 p-1 text-white/90 font-light">
+            <p>{photos.length}/16</p>
+          </div>
         </div>
 
-        <p className="text-center text-sm font-medium">
+        <p className="self-end pb-6 text-center text-sm font-medium">
           {16-photos.length}장 남았어요.
         </p>
 
         <button
           type="button"
           onClick={completeCapture}
-          className="flex size-12 items-center justify-center justify-self-end rounded-full bg-surface text-xl"
+          className="flex w-24 h-12 items-center justify-center justify-self-end rounded-4xl bg-white/90 ring-1 ring-primary/50"
           aria-label="촬영 완료"
         >
           <ArrowRight

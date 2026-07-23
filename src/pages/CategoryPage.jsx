@@ -35,7 +35,7 @@ const CategoryPage = () => {
                 </button>
             </header>
       
-      <section className="mt-10">
+      <section className="mt-8">
         <h2 className="text-3xl font-semibold">
           카테고리 선택
         </h2>
