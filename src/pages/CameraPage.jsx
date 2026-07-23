@@ -72,7 +72,7 @@ const CameraPage = () => {
 
   return (
     <main className = "relative mx-auto h-dvh w-full max-w-md overflow-hidden">
-      <header className = "absolute inset-x-0 top-0 z-20 flex h-14 items-end justify-between px-4 pb-1">
+      <header className = "absolute inset-x-0 top-0 z-20 flex h-14 items-end justify-between px-4 pb-3">
         <button
           type="button"
           className = "rounded-full bg-primary px-8 py-1.5 text-sm font-semibold text-white"
@@ -176,7 +176,7 @@ const CameraPage = () => {
         <button
           type="button"
           onClick={completeCapture}
-          className="flex w-24 h-12 items-center justify-center justify-self-end rounded-4xl bg-white/90 ring-1 ring-primary/50"
+          className="flex w-24 h-12 items-center justify-center justify-self-end rounded-4xl bg-white/90 ring-1 ring-primary/50 hover:bg-primary/20 hover:cursor-pointer"
           aria-label="촬영 완료"
         >
           <ArrowRight
