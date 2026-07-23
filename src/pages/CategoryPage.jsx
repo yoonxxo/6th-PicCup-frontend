@@ -21,7 +21,7 @@ const CategoryPage = () => {
   return (
     <main className="flex min-h-dvh flex-col">
         <div className="flex-1 px-4 pt-6">
-            <header className="flex items-center justify-between px-2 pt-12">
+            <header className="flex items-center justify-between px-2">
                 <h1 className="text-3xl font-bold tracking-tight">
                 PicCup
                 </h1>

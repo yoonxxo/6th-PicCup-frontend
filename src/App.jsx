@@ -26,7 +26,7 @@ const App = () => {
   }, []);
 
   return (
-    <main className="min-h-dvh bg-gray-100">
+    <main className="min-h-dvh">
       <div className="mx-auto min-h-dvh w-full max-w-md bg-background">
         <Routes>
           <Route 
