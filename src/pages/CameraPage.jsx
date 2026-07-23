@@ -167,7 +167,7 @@ const CameraPage = () => {
         </div>
 
         <p className="text-center text-sm font-medium">
-          {photos.length}장 촬영했어요.
+          {16-photos.length}장 남았어요.
         </p>
 
         <button

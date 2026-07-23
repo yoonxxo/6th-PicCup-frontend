@@ -8,6 +8,7 @@
   --color-secondary: #F27289;
 
   --color-background: #ffffff;
+  --color-page-background: #f3f4f6; /*gray100*/
   --color-surface: #D9D8D2;
 
   --color-text-primary: #1a1a1a;
@@ -39,6 +40,6 @@ body,
 body {
   min-height: 100dvh; /* 모바일 브라우저 주소창이 열리고 닫히는 상황 고려 */
   color: var(--color-text-primary);
-  background-color: var(--color-background);
+  background-color: var(--color-page-background);
   font-family: var(--font-sans);
 }
